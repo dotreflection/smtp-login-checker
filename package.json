@@ -1,0 +1,42 @@
+{
+  "name": "smtp-login-checker",
+  "version": "1.0.0",
+  "description": "Test SMTP credentials with a full authentication handshake, locally. Credentials never leave your machine. Free and open source by dotreflection.",
+  "license": "MIT",
+  "author": "dotreflection",
+  "homepage": "https://github.com/dotreflection/smtp-login-checker",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dotreflection/smtp-login-checker.git"
+  },
+  "type": "commonjs",
+  "bin": {
+    "smtp-login-checker": "server.js"
+  },
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "smtp",
+    "smtp-auth",
+    "email",
+    "credentials",
+    "test",
+    "starttls",
+    "privacy",
+    "local",
+    "zero-dependency"
+  ],
+  "files": [
+    "server.js",
+    "lib/",
+    "public/",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {}
+}
