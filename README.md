@@ -5,7 +5,9 @@ handshake — and watch every step of the SMTP conversation. Your username and
 password are sent **only** to the mail server you name; never to dotreflection
 or any other third party.
 
-Free and open source, by [dotreflection](https://dotreflection.de).
+Free and open source, by [dotreflection](https://dotreflection.de). Landing page:
+[smtptester.dotreflection.com](https://smtptester.dotreflection.com) — it hands you
+the one command below; the checker itself always runs on your own machine.
 
 ```
 ┌──────────┐      127.0.0.1       ┌──────────────────┐      direct SMTP      ┌─────────────┐
