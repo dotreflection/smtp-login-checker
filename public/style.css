@@ -288,6 +288,20 @@ code {
 }
 .panel h2 { margin: 0 0 var(--s-4); font-size: 1.2rem; letter-spacing: -0.01em; }
 
+/* Local vs hosted --------------------------------------------------------- */
+/* The live form only appears when served from 127.0.0.1; otherwise the page is
+   a landing page and shows the "run it locally" notice instead. Defaulting to
+   the hosted state means the public page never flashes a non-working form. */
+.form-panel { display: none; }
+.is-local .form-panel { display: block; }
+.is-local .landing-notice { display: none; }
+
+.landing-notice p {
+  margin: 0 0 var(--s-5);
+  max-width: 68ch;
+  color: var(--ink-soft);
+}
+
 /* Form -------------------------------------------------------------------- */
 .grid {
   display: grid;

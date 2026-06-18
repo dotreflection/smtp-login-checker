@@ -3,13 +3,22 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Same policy the local server sends as a header, so the hosted landing page
+         is equally locked down: it loads and contacts nothing but its own origin. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'"
+    />
     <title>SMTP Login Checker — test SMTP credentials locally</title>
     <meta
       name="description"
       content="Test SMTP credentials with a full authentication handshake. Runs entirely on your own machine — credentials never reach a third party. Free and open source by dotreflection."
     />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <!-- Reveal the live form only when served locally (127.0.0.1). Runs before
+         first paint so the public landing page never flashes a dead form. -->
+    <script src="boot.js"></script>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <a class="skip-link" href="#test">Skip to the form</a>
@@ -48,7 +57,7 @@
           <p class="launch-label">Launch it on your machine — one command, nothing installed permanently:</p>
           <div class="command">
             <code id="install-cmd">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/dotreflection/smtp-login-checker/main/install.sh)"</code>
-            <button type="button" id="copy-cmd" class="copy-cmd" aria-label="Copy command to clipboard">Copy</button>
+            <button type="button" class="copy-cmd" data-copy="install" aria-label="Copy command to clipboard">Copy</button>
           </div>
           <p class="launch-sub">
             Downloads the source into a temporary folder, runs it locally, and opens this page in your browser.
@@ -86,6 +95,16 @@
             </div>
           </li>
         </ul>
+      </section>
+
+      <section id="landing-notice" class="panel landing-notice" aria-labelledby="landing-heading">
+        <h2 id="landing-heading">Start it to test a login</h2>
+        <p>
+          For your security, the SMTP login test runs on your own machine — never on this website.
+          Copy the command above and run it in a terminal: it downloads the tool, starts it locally,
+          and opens the live tester at <code>127.0.0.1</code>. Your credentials never reach this site.
+        </p>
+        <button type="button" class="primary" data-copy="install">Copy launch command</button>
       </section>
 
       <section id="test" class="panel form-panel" aria-labelledby="form-heading">
@@ -200,6 +219,6 @@
       </div>
     </footer>
 
-    <script src="/app.js" defer></script>
+    <script src="app.js" defer></script>
   </body>
 </html>

@@ -10,7 +10,6 @@
   const passwordInput = document.getElementById('password');
   const togglePassword = document.getElementById('toggle-password');
 
-  const copyCmd = document.getElementById('copy-cmd');
   const installCmd = document.getElementById('install-cmd');
 
   const resultSection = document.getElementById('result');
@@ -55,7 +54,7 @@
 
     setBusy(true);
     try {
-      const response = await fetch('/api/check', {
+      const response = await fetch('api/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -73,13 +72,17 @@
     }
   });
 
-  copyCmd.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(installCmd.textContent);
-      flash(copyCmd, 'Copied');
-    } catch {
-      flash(copyCmd, 'Press Ctrl+C');
-    }
+  // Copy-the-launch-command buttons (hero + landing notice). These work on the
+  // hosted landing page too, so they are wired up regardless of local/hosted.
+  document.querySelectorAll('[data-copy="install"]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(installCmd.textContent);
+        flash(btn, 'Copied');
+      } catch {
+        flash(btn, 'Press Ctrl+C');
+      }
+    });
   });
 
   copyBtn.addEventListener('click', async () => {
