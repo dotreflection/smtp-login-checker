@@ -1,0 +1,7 @@
+# https://smtptester.dotreflection.com/
+# Public landing page only. The SMTP checker itself runs locally on a
+# visitor's machine and is never served from this host.
+User-agent: *
+Allow: /
+
+Sitemap: https://smtptester.dotreflection.com/sitemap.xml

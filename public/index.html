@@ -15,7 +15,61 @@
       name="description"
       content="Test SMTP credentials with a full authentication handshake. Runs entirely on your own machine — credentials never reach a third party. Free and open source by dotreflection."
     />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://smtptester.dotreflection.com/" />
+
+    <!-- Open Graph / social preview. og:image is same-origin so it stays within
+         the strict CSP, and must be an absolute URL for crawlers. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="dotreflection" />
+    <meta property="og:url" content="https://smtptester.dotreflection.com/" />
+    <meta property="og:title" content="SMTP Login Checker — test SMTP credentials locally" />
+    <meta
+      property="og:description"
+      content="Test SMTP credentials with a full authentication handshake. Runs entirely on your own machine — credentials never reach a third party. Free and open source by dotreflection."
+    />
+    <meta property="og:image" content="https://smtptester.dotreflection.com/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SMTP Login Checker by dotreflection — test SMTP credentials locally" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SMTP Login Checker — test SMTP credentials locally" />
+    <meta
+      name="twitter:description"
+      content="Test SMTP credentials with a full authentication handshake — entirely on your own machine, credentials never reach a third party."
+    />
+    <meta name="twitter:image" content="https://smtptester.dotreflection.com/og.png" />
+
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+
+    <!-- Structured data: a data block, not executable script, so the strict CSP
+         does not apply. Helps search engines understand what this tool is. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "SMTP Login Checker",
+        "url": "https://smtptester.dotreflection.com/",
+        "description": "Test SMTP credentials with a full authentication handshake. Runs entirely on your own machine — credentials never reach a third party. Free and open source by dotreflection.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Windows, macOS, Linux",
+        "softwareRequirements": "Node.js 18 or newer",
+        "downloadUrl": "https://github.com/dotreflection/smtp-login-checker",
+        "license": "https://github.com/dotreflection/smtp-login-checker/blob/main/LICENSE",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "dotreflection",
+          "url": "https://dotreflection.de"
+        }
+      }
+    </script>
     <!-- Reveal the live form only when served locally (127.0.0.1). Runs before
          first paint so the public landing page never flashes a dead form. -->
     <script src="boot.js"></script>
