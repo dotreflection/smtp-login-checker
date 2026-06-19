@@ -286,7 +286,9 @@ code {
 }
 .trust div { display: flex; flex-direction: column; gap: 2px; }
 .trust strong { font-size: 0.95rem; }
-.trust span { font-size: 0.85rem; color: var(--ink-faint); }
+/* Scope to the text spans only — a bare ".trust span" also matches .trust-icon
+   (which is a <span>) and would override its accent colour, greying the icon. */
+.trust div span { font-size: 0.85rem; color: var(--ink-faint); }
 .trust code { font-size: 0.8em; }
 
 /* Panels ------------------------------------------------------------------ */
