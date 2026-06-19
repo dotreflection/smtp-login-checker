@@ -1,4 +1,4 @@
-/* smtp-login-checker — design tokens + layout. No external fonts or assets. */
+/* smtp-login-checker — design tokens + layout. Self-hosted font, no third-party requests. */
 
 :root {
   /* Spacing scale (4px base) */
@@ -15,18 +15,19 @@
   --radius-sm: 8px;
   --maxw: 880px;
 
-  /* Light palette — calm slate with a single indigo accent */
-  --bg: #f4f6fb;
+  /* Light palette — dotreflection brand: deep navy-teal ink, muted blue accent */
+  --bg: #f1f7f9;
   --bg-elevated: #ffffff;
-  --ink: #1b2230;
-  --ink-soft: #4a5468;
-  --ink-faint: #6b7488;
-  --line: #e2e6ef;
-  --line-strong: #ccd2e0;
+  --ink: #182834;
+  --ink-soft: #41555f;
+  --ink-faint: #6a7e88;
+  --line: #dde8ec;
+  --line-strong: #c5d6dc;
 
-  --accent: #3a55d9;
-  --accent-ink: #2c41ad;
-  --accent-wash: #eef1fd;
+  --accent: #2f6d88;        /* primary button background (white text passes AA) */
+  --accent-strong: #25596f; /* button hover */
+  --accent-ink: #1f5b75;    /* links, icons, text on the light wash */
+  --accent-wash: #e6f1f5;   /* tinted surfaces, chips, focus rings */
 
   --success: #137a4b;
   --success-wash: #e6f6ee;
@@ -37,26 +38,37 @@
   --warning: #8a5a00;
   --warning-wash: #fdf3e1;
 
-  --shadow-sm: 0 1px 2px rgba(20, 28, 48, 0.06), 0 1px 3px rgba(20, 28, 48, 0.04);
-  --shadow-md: 0 4px 14px rgba(20, 28, 48, 0.08), 0 2px 4px rgba(20, 28, 48, 0.04);
+  --shadow-sm: 0 1px 2px rgba(24, 40, 52, 0.06), 0 1px 3px rgba(24, 40, 52, 0.05);
+  --shadow-md: 0 4px 14px rgba(24, 40, 52, 0.09), 0 2px 4px rgba(24, 40, 52, 0.05);
 
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* Self-hosted DM Sans (variable weight, latin). No third-party font requests,
+   so the strict CSP and the "nothing leaves your machine" promise both hold. */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("fonts/dm-sans-latin-wght-normal.woff2") format("woff2");
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0e1220;
-    --bg-elevated: #161b2c;
-    --ink: #e8ecf6;
-    --ink-soft: #aab2c7;
-    --ink-faint: #828ba3;
-    --line: #262d42;
-    --line-strong: #333c56;
+    --bg: #0f1c24;
+    --bg-elevated: #182834;   /* brand navy-teal surface */
+    --ink: #e7eff2;
+    --ink-soft: #a6bcc4;
+    --ink-faint: #7c919b;
+    --line: #243a47;
+    --line-strong: #335160;
 
-    --accent: #8fa2ff;
-    --accent-ink: #aab8ff;
-    --accent-wash: #1c2238;
+    --accent: #3c7f9e;        /* button background (white text) */
+    --accent-strong: #336c83; /* button hover */
+    --accent-ink: #9fcadb;    /* links and icons on dark surfaces */
+    --accent-wash: #16323f;   /* tinted dark surfaces */
 
     --success: #59d39b;
     --success-wash: #12241c;
@@ -188,7 +200,7 @@ code {
   display: flex;
   align-items: stretch;
   gap: var(--s-3);
-  background: #11151f;
+  background: #13242e;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   padding: var(--s-3) var(--s-3) var(--s-3) var(--s-4);
@@ -382,16 +394,29 @@ input::placeholder { color: var(--ink-faint); }
 .checkbox input { width: 17px; height: 17px; accent-color: var(--accent); }
 .hint { margin: var(--s-1) 0 0; font-size: 0.78rem; color: var(--ink-faint); }
 .label-optional {
-  font-weight: 500;
-  font-size: 0.72rem;
+  font-weight: 600;
+  font-size: 0.66rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--ink-faint);
   background: var(--bg);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: 999px;
-  padding: 0.05em 0.45em;
-  margin-left: 0.35em;
+  padding: 0.1em 0.5em;
+  line-height: 1.5;
+}
+
+/* The optional "send a test email" row, separated from the credentials above. */
+.field-to {
+  grid-column: span 6;
+  margin-top: var(--s-2);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+}
+.field-to > label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
 }
 
 .advanced {
@@ -439,26 +464,10 @@ input::placeholder { color: var(--ink-faint); }
   cursor: pointer;
   transition: background 0.15s, transform 0.05s;
 }
-.primary:hover { background: var(--accent-ink); }
+.primary:hover { background: var(--accent-strong); }
 .primary:active { transform: translateY(1px); }
 .primary:focus-visible { outline: 3px solid var(--accent-wash); outline-offset: 2px; }
 .primary[disabled] { opacity: 0.7; cursor: progress; }
-
-.secondary {
-  display: inline-flex; align-items: center; gap: var(--s-2);
-  font: inherit; font-weight: 600; font-size: 0.95rem;
-  color: var(--accent-ink);
-  background: transparent;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  padding: 0.7rem 1.2rem;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.05s;
-}
-.secondary:hover { border-color: var(--accent); background: var(--accent-wash); }
-.secondary:active { transform: translateY(1px); }
-.secondary:focus-visible { outline: 3px solid var(--accent-wash); outline-offset: 2px; }
-.secondary[disabled] { opacity: 0.6; cursor: progress; }
 
 .spinner {
   display: none;
@@ -468,8 +477,6 @@ input::placeholder { color: var(--ink-faint); }
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
-/* On the light-background secondary button the spinner needs accent colours. */
-.secondary .spinner { border-color: var(--accent-wash); border-top-color: var(--accent); }
 .is-busy .spinner { display: inline-block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

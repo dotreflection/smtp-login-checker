@@ -5,7 +5,6 @@
 (function () {
   const form = document.getElementById('smtp-form');
   const submit = document.getElementById('submit');
-  const sendBtn = document.getElementById('send');
   const security = document.getElementById('security');
   const port = document.getElementById('port');
   const toInput = document.getElementById('to');
@@ -47,21 +46,20 @@
     togglePassword.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
   });
 
-  // Clear the "recipient required" message as soon as the user types one.
-  toInput.addEventListener('input', () => toInput.setCustomValidity(''));
+  // One button, two modes: empty recipient -> "Test login" (auth only); a
+  // recipient -> "Send test email". The label follows what the user typed.
+  const idleLabel = () => (toInput.value.trim() ? 'Send test email' : 'Test login');
+  const refreshButton = () => { if (!submit.disabled) submit.querySelector('.btn-label').textContent = idleLabel(); };
+  toInput.addEventListener('input', refreshButton);
 
-  // "Test login" submits the form; "Send test email" is a separate action.
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    run('auth', submit);
+    run();
   });
-  sendBtn.addEventListener('click', () => run('send', sendBtn));
 
-  async function run(action, button) {
-    if (action === 'send' && !toInput.value.trim()) {
-      toInput.setCustomValidity('Enter a recipient to send a test email.');
-    }
+  async function run() {
     if (!form.reportValidity()) return;
+    const action = toInput.value.trim() ? 'send' : 'auth';
 
     const payload = {
       host: form.host.value.trim(),
@@ -83,7 +81,7 @@
       return;
     }
 
-    setBusy(button, true);
+    setBusy(true, action);
     try {
       const response = await fetch('api/check', {
         method: 'POST',
@@ -100,7 +98,7 @@
     } catch {
       renderError('Could not reach the local checker. Is the server still running?');
     } finally {
-      setBusy(button, false);
+      setBusy(false, action);
     }
   }
 
@@ -147,17 +145,11 @@
     flash(downloadBtn, 'Saved');
   });
 
-  function setBusy(button, busy) {
-    [submit, sendBtn].forEach((b) => { b.disabled = busy; });
-    const label = button.querySelector('.btn-label');
-    if (busy) {
-      button.classList.add('is-busy');
-      label.dataset.idle = label.textContent;
-      label.textContent = button === submit ? 'Testing…' : 'Sending…';
-    } else {
-      button.classList.remove('is-busy');
-      if (label.dataset.idle) label.textContent = label.dataset.idle;
-    }
+  function setBusy(busy, action) {
+    submit.disabled = busy;
+    submit.classList.toggle('is-busy', busy);
+    const label = submit.querySelector('.btn-label');
+    label.textContent = busy ? (action === 'send' ? 'Sending…' : 'Testing…') : idleLabel();
   }
 
   function showHostedGuidance() {

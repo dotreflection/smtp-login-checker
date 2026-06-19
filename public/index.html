@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#182834" />
     <!-- Same policy the local server sends as a header, so the hosted landing page
          is equally locked down: it loads and contacts nothing but its own origin. -->
     <meta
@@ -141,9 +142,12 @@
             </div>
 
             <div class="field field-to">
-              <label for="to">Send test email to <span class="label-optional">optional</span></label>
+              <label for="to">
+                <span>Send test email to</span>
+                <span class="label-optional">optional</span>
+              </label>
               <input id="to" name="to" type="email" inputmode="email" placeholder="recipient@example.com" spellcheck="false" autocapitalize="off" autocomplete="off" />
-              <p class="hint">Only used by “Send test email”. Leave empty to just check the login.</p>
+              <p class="hint">Add a recipient and the button below switches to “Send test email”. Leave it empty to just check the login.</p>
             </div>
           </div>
 
@@ -178,15 +182,11 @@
           </details>
 
           <div class="actions">
-            <button type="submit" id="submit" class="primary" data-action="auth">
+            <button type="submit" id="submit" class="primary">
               <span class="btn-label">Test login</span>
               <span class="spinner" aria-hidden="true"></span>
             </button>
-            <button type="button" id="send" class="secondary" data-action="send">
-              <span class="btn-label">Send test email</span>
-              <span class="spinner" aria-hidden="true"></span>
-            </button>
-            <p class="actions-note">“Test login” authenticates and disconnects. “Send test email” also delivers one message to the recipient.</p>
+            <p class="actions-note">Authenticates and disconnects. With a recipient above, it also delivers one short test message.</p>
           </div>
         </form>
       </section>
