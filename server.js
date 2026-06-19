@@ -81,6 +81,13 @@ function readBody(req) {
   });
 }
 
+// A deliberately conservative address check. Anything that could break out of a
+// "MAIL FROM:<...>" command or inject a mail header (CRLF, spaces, angle
+// brackets) is rejected — this is the SMTP-injection guard, not RFC 5321 parsing.
+function isSafeAddress(value) {
+  return /^[^\s<>"@]+@[^\s<>"@]+\.[^\s<>"@]+$/.test(value);
+}
+
 function validate(payload) {
   const errors = [];
   const host = String(payload.host || '').trim();
@@ -88,12 +95,27 @@ function validate(payload) {
   const security = String(payload.security || '').toLowerCase();
   const username = String(payload.username || '');
   const password = String(payload.password || '');
+  const action = String(payload.action || 'auth').toLowerCase();
+  const to = String(payload.to || '').trim();
+  const from = String(payload.from || '').trim();
 
   if (!host || /[\s/\\]/.test(host)) errors.push('A valid host is required.');
   if (!Number.isInteger(port) || port < 1 || port > 65535) errors.push('Port must be between 1 and 65535.');
   if (!['tls', 'starttls', 'none'].includes(security)) errors.push('Security must be tls, starttls or none.');
   if (!username) errors.push('Username is required.');
   if (!password) errors.push('Password is required.');
+  if (!['auth', 'send'].includes(action)) errors.push('Action must be auth or send.');
+
+  if (action === 'send') {
+    if (!to) errors.push('A recipient is required to send a test email.');
+    else if (!isSafeAddress(to)) errors.push('The recipient address looks invalid.');
+    // The envelope sender defaults to the username, so the effective From must
+    // be a valid address too (and never carry CRLF into the MAIL FROM command).
+    const effectiveFrom = from || username;
+    if (!isSafeAddress(effectiveFrom)) {
+      errors.push('To send mail, set a valid From address (the username is not a usable email).');
+    }
+  }
 
   return {
     errors,
@@ -103,6 +125,9 @@ function validate(payload) {
       security,
       username,
       password,
+      action,
+      to,
+      from,
       authMethod: String(payload.authMethod || 'auto').toLowerCase(),
       verifyCert: payload.verifyCert !== false,
       timeout: Number(payload.timeout) || 15000,
