@@ -316,6 +316,15 @@ code {
 }
 .is-local .hosted-note { display: none; }
 
+/* Public preview: the form is shown for design parity but disabled, since it
+   can't run a real check without the local backend. Greyed from first paint
+   (boot.js sets .is-local pre-paint); app.js also marks it inert for keyboard. */
+html:not(.is-local) #smtp-form {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(0.25);
+}
+
 /* Form -------------------------------------------------------------------- */
 .grid {
   display: grid;

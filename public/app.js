@@ -21,8 +21,10 @@
   const downloadBtn = document.getElementById('download-log');
 
   // boot.js sets this before first paint when served from loopback. Off the
-  // local machine the form can't run a check, so we guide instead of fetching.
+  // local machine the form can't run a check, so it is shown for design parity
+  // but fully disabled (inert blocks mouse, keyboard, and focus).
   const isLocal = document.documentElement.classList.contains('is-local');
+  if (!isLocal) form.inert = true;
 
   // Remembered from the last run, used to label a downloaded log.
   let lastMeta = null;
