@@ -97,18 +97,15 @@
         </ul>
       </section>
 
-      <section id="landing-notice" class="panel landing-notice" aria-labelledby="landing-heading">
-        <h2 id="landing-heading">Start it to test a login</h2>
-        <p>
-          For your security, the SMTP login test runs on your own machine — never on this website.
-          Copy the command above and run it in a terminal: it downloads the tool, starts it locally,
-          and opens the live tester at <code>127.0.0.1</code>. Your credentials never reach this site.
-        </p>
-        <button type="button" class="primary" data-copy="install">Copy launch command</button>
-      </section>
-
       <section id="test" class="panel form-panel" aria-labelledby="form-heading">
         <h2 id="form-heading" class="visually-hidden">Connection details</h2>
+
+        <p id="hosted-note" class="hosted-note">
+          This is the public preview. For your security, tests run on your own machine, not on this
+          site — run the command above to start the local checker, then this form does real checks.
+          You can still fill it in here to get a feel for it.
+        </p>
+
         <form id="smtp-form" novalidate autocomplete="off">
           <div class="grid">
             <div class="field field-host">
@@ -142,6 +139,12 @@
                 <button type="button" id="toggle-password" class="affix-btn" aria-label="Show password" aria-pressed="false">Show</button>
               </div>
             </div>
+
+            <div class="field field-to">
+              <label for="to">Send test email to <span class="label-optional">optional</span></label>
+              <input id="to" name="to" type="email" inputmode="email" placeholder="recipient@example.com" spellcheck="false" autocapitalize="off" autocomplete="off" />
+              <p class="hint">Only used by “Send test email”. Leave empty to just check the login.</p>
+            </div>
           </div>
 
           <details class="advanced">
@@ -160,6 +163,10 @@
                 <label for="timeout">Timeout (seconds)</label>
                 <input id="timeout" name="timeout" type="number" min="1" max="60" value="15" />
               </div>
+              <div class="field">
+                <label for="from">From address</label>
+                <input id="from" name="from" type="email" placeholder="defaults to the username" spellcheck="false" autocapitalize="off" autocomplete="off" />
+              </div>
               <div class="field field-checkbox">
                 <label class="checkbox">
                   <input id="verifyCert" name="verifyCert" type="checkbox" checked />
@@ -171,11 +178,15 @@
           </details>
 
           <div class="actions">
-            <button type="submit" id="submit" class="primary">
+            <button type="submit" id="submit" class="primary" data-action="auth">
               <span class="btn-label">Test login</span>
               <span class="spinner" aria-hidden="true"></span>
             </button>
-            <p class="actions-note">No email is sent. The tool authenticates, confirms the result, then disconnects.</p>
+            <button type="button" id="send" class="secondary" data-action="send">
+              <span class="btn-label">Send test email</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+            <p class="actions-note">“Test login” authenticates and disconnects. “Send test email” also delivers one message to the recipient.</p>
           </div>
         </form>
       </section>
@@ -183,7 +194,10 @@
       <section id="result" class="panel result-panel" hidden aria-live="polite" aria-labelledby="result-heading">
         <div class="result-header">
           <h2 id="result-heading">Result</h2>
-          <button type="button" id="copy-transcript" class="ghost-btn">Copy transcript</button>
+          <div class="result-actions">
+            <button type="button" id="copy-transcript" class="ghost-btn">Copy transcript</button>
+            <button type="button" id="download-log" class="ghost-btn">Download log</button>
+          </div>
         </div>
         <div id="status-banner" class="status-banner" role="status"></div>
         <div id="capabilities" class="capabilities" hidden></div>

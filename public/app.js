@@ -5,8 +5,10 @@
 (function () {
   const form = document.getElementById('smtp-form');
   const submit = document.getElementById('submit');
+  const sendBtn = document.getElementById('send');
   const security = document.getElementById('security');
   const port = document.getElementById('port');
+  const toInput = document.getElementById('to');
   const passwordInput = document.getElementById('password');
   const togglePassword = document.getElementById('toggle-password');
 
@@ -17,6 +19,14 @@
   const capabilities = document.getElementById('capabilities');
   const transcript = document.getElementById('transcript');
   const copyBtn = document.getElementById('copy-transcript');
+  const downloadBtn = document.getElementById('download-log');
+
+  // boot.js sets this before first paint when served from loopback. Off the
+  // local machine the form can't run a check, so we guide instead of fetching.
+  const isLocal = document.documentElement.classList.contains('is-local');
+
+  // Remembered from the last run, used to label a downloaded log.
+  let lastMeta = null;
 
   // Default ports per encryption mode. We only auto-fill when the field still
   // holds a known default, so a user's custom port is never overwritten.
@@ -37,8 +47,20 @@
     togglePassword.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
   });
 
-  form.addEventListener('submit', async (event) => {
+  // Clear the "recipient required" message as soon as the user types one.
+  toInput.addEventListener('input', () => toInput.setCustomValidity(''));
+
+  // "Test login" submits the form; "Send test email" is a separate action.
+  form.addEventListener('submit', (event) => {
     event.preventDefault();
+    run('auth', submit);
+  });
+  sendBtn.addEventListener('click', () => run('send', sendBtn));
+
+  async function run(action, button) {
+    if (action === 'send' && !toInput.value.trim()) {
+      toInput.setCustomValidity('Enter a recipient to send a test email.');
+    }
     if (!form.reportValidity()) return;
 
     const payload = {
@@ -47,12 +69,21 @@
       security: form.security.value,
       username: form.username.value,
       password: form.password.value,
+      action,
+      to: form.to.value.trim(),
+      from: form.from.value.trim(),
       authMethod: form.authMethod.value,
       verifyCert: form.verifyCert.checked,
       timeout: Math.round(Number(form.timeout.value || 15) * 1000),
     };
 
-    setBusy(true);
+    // The public page has no backend; point visitors at the launch command.
+    if (!isLocal) {
+      showHostedGuidance();
+      return;
+    }
+
+    setBusy(button, true);
     try {
       const response = await fetch('api/check', {
         method: 'POST',
@@ -63,17 +94,18 @@
       if (!response.ok) {
         renderError(data.error || 'Request failed.');
       } else {
+        lastMeta = { host: payload.host, port: payload.port, security: payload.security, summary: data.summary || '' };
         renderResult(data);
       }
-    } catch (err) {
+    } catch {
       renderError('Could not reach the local checker. Is the server still running?');
     } finally {
-      setBusy(false);
+      setBusy(button, false);
     }
-  });
+  }
 
-  // Copy-the-launch-command buttons (hero + landing notice). These work on the
-  // hosted landing page too, so they are wired up regardless of local/hosted.
+  // Copy-the-launch-command buttons (hero + anywhere else). Works on the hosted
+  // page too, so they are wired up regardless of local/hosted.
   document.querySelectorAll('[data-copy="install"]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       try {
@@ -94,10 +126,52 @@
     }
   });
 
-  function setBusy(busy) {
-    submit.disabled = busy;
-    submit.classList.toggle('is-busy', busy);
-    submit.querySelector('.btn-label').textContent = busy ? 'Testing…' : 'Test login';
+  downloadBtn.addEventListener('click', () => {
+    const log = transcript.textContent.trim();
+    if (!log) {
+      flash(downloadBtn, 'Nothing yet');
+      return;
+    }
+    const stamp = timestamp();
+    const host = (lastMeta && lastMeta.host) || 'smtp';
+    const header = [
+      'SMTP Login Checker — session log',
+      lastMeta ? `Server:  ${lastMeta.host}:${lastMeta.port} (${lastMeta.security})` : '',
+      `Date:    ${new Date().toISOString()}`,
+      lastMeta ? `Result:  ${lastMeta.summary}` : '',
+      'Note:    credential bytes are redacted; raw values never appear below.',
+      '',
+      '',
+    ].filter((l) => l !== '').join('\n');
+    downloadText(`${header}\n${log}\n`, `smtp-login-checker-${slug(host)}-${stamp}.txt`);
+    flash(downloadBtn, 'Saved');
+  });
+
+  function setBusy(button, busy) {
+    [submit, sendBtn].forEach((b) => { b.disabled = busy; });
+    const label = button.querySelector('.btn-label');
+    if (busy) {
+      button.classList.add('is-busy');
+      label.dataset.idle = label.textContent;
+      label.textContent = button === submit ? 'Testing…' : 'Sending…';
+    } else {
+      button.classList.remove('is-busy');
+      if (label.dataset.idle) label.textContent = label.dataset.idle;
+    }
+  }
+
+  function showHostedGuidance() {
+    revealResult();
+    capabilities.hidden = true;
+    statusBanner.className = 'status-banner info';
+    statusBanner.innerHTML = '';
+    statusBanner.appendChild(
+      bannerContent(
+        'Run it on your machine to test for real',
+        'This public page can’t open SMTP connections. Copy the command at the top, run it in your terminal, and the checker opens locally — then this exact form does real checks against your server.',
+      ),
+    );
+    transcript.textContent = '';
   }
 
   function renderError(message) {
@@ -112,11 +186,12 @@
   function renderResult(data) {
     revealResult();
 
+    const title = data.success ? (data.sent ? 'Test email sent' : 'Login successful') : 'Login failed';
     statusBanner.className = 'status-banner ' + (data.success ? 'success' : 'failure');
     statusBanner.innerHTML = '';
     statusBanner.appendChild(
       bannerContent(
-        data.success ? 'Login successful' : 'Login failed',
+        title,
         data.summary || (data.success ? 'The server accepted these credentials.' : 'The server rejected the login.'),
       ),
     );
@@ -194,6 +269,28 @@
   function revealResult() {
     resultSection.hidden = false;
     resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function downloadText(text, filename) {
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  function slug(value) {
+    return value.replace(/[^a-zA-Z0-9.-]/g, '_').slice(0, 40) || 'smtp';
+  }
+
+  function timestamp() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
   }
 
   function flash(button, text) {

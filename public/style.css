@@ -289,18 +289,20 @@ code {
 .panel h2 { margin: 0 0 var(--s-4); font-size: 1.2rem; letter-spacing: -0.01em; }
 
 /* Local vs hosted --------------------------------------------------------- */
-/* The live form only appears when served from 127.0.0.1; otherwise the page is
-   a landing page and shows the "run it locally" notice instead. Defaulting to
-   the hosted state means the public page never flashes a non-working form. */
-.form-panel { display: none; }
-.is-local .form-panel { display: block; }
-.is-local .landing-notice { display: none; }
-
-.landing-notice p {
+/* The form is shown everywhere so the public page looks like the real tool.
+   It only performs live checks on 127.0.0.1; on the hosted page a note explains
+   that and the submit handlers point visitors to the launch command instead. */
+.hosted-note {
   margin: 0 0 var(--s-5);
-  max-width: 68ch;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--accent-wash);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--accent-wash);
   color: var(--ink-soft);
+  font-size: 0.86rem;
 }
+.is-local .hosted-note { display: none; }
 
 /* Form -------------------------------------------------------------------- */
 .grid {
@@ -379,6 +381,18 @@ input::placeholder { color: var(--ink-faint); }
 }
 .checkbox input { width: 17px; height: 17px; accent-color: var(--accent); }
 .hint { margin: var(--s-1) 0 0; font-size: 0.78rem; color: var(--ink-faint); }
+.label-optional {
+  font-weight: 500;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.05em 0.45em;
+  margin-left: 0.35em;
+}
 
 .advanced {
   margin-top: var(--s-5);
@@ -412,7 +426,7 @@ input::placeholder { color: var(--ink-faint); }
   margin-top: var(--s-5);
   flex-wrap: wrap;
 }
-.actions-note { margin: 0; font-size: 0.82rem; color: var(--ink-faint); }
+.actions-note { margin: 0; flex: 1 1 100%; font-size: 0.82rem; color: var(--ink-faint); }
 
 .primary {
   display: inline-flex; align-items: center; gap: var(--s-2);
@@ -430,6 +444,22 @@ input::placeholder { color: var(--ink-faint); }
 .primary:focus-visible { outline: 3px solid var(--accent-wash); outline-offset: 2px; }
 .primary[disabled] { opacity: 0.7; cursor: progress; }
 
+.secondary {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  font: inherit; font-weight: 600; font-size: 0.95rem;
+  color: var(--accent-ink);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+}
+.secondary:hover { border-color: var(--accent); background: var(--accent-wash); }
+.secondary:active { transform: translateY(1px); }
+.secondary:focus-visible { outline: 3px solid var(--accent-wash); outline-offset: 2px; }
+.secondary[disabled] { opacity: 0.6; cursor: progress; }
+
 .spinner {
   display: none;
   width: 15px; height: 15px;
@@ -438,13 +468,16 @@ input::placeholder { color: var(--ink-faint); }
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
+/* On the light-background secondary button the spinner needs accent colours. */
+.secondary .spinner { border-color: var(--accent-wash); border-top-color: var(--accent); }
 .is-busy .spinner { display: inline-block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
 
 /* Result ------------------------------------------------------------------ */
-.result-header { display: flex; align-items: center; justify-content: space-between; }
+.result-header { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); flex-wrap: wrap; }
 .result-header h2 { margin: 0; }
+.result-actions { display: flex; gap: var(--s-2); }
 .ghost-btn {
   font: inherit; font-size: 0.82rem; font-weight: 600;
   color: var(--ink-soft);
@@ -467,6 +500,7 @@ input::placeholder { color: var(--ink-faint); }
 .status-banner .status-title { font-weight: 700; display: block; }
 .status-banner.success { background: var(--success-wash); border-color: var(--success-line); color: var(--success); }
 .status-banner.failure { background: var(--danger-wash); border-color: var(--danger-line); color: var(--danger); }
+.status-banner.info { background: var(--accent-wash); border-color: var(--accent-wash); color: var(--accent-ink); }
 .status-banner .status-detail { color: var(--ink-soft); font-weight: 400; }
 .status-banner.success .status-detail,
 .status-banner.failure .status-detail { color: inherit; opacity: 0.9; }

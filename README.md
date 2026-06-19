@@ -68,10 +68,14 @@ Use a different port with `PORT=8030 node server.js`.
    advertised capabilities.
 3. Authenticates using `PLAIN`, `LOGIN`, or `CRAM-MD5` (auto-detected by default).
 4. Reports success or the exact server rejection, with the full session
-   transcript.
+   transcript, which you can copy or **download as a log**.
 
-**No email is ever sent.** The tool authenticates, confirms the result, and
-disconnects with `QUIT`.
+Two actions:
+
+- **Test login** — authenticates, confirms the result, and disconnects with
+  `QUIT`. No email is sent.
+- **Send test email** — does the same, then delivers one short, clearly-labelled
+  test message to a recipient you choose (`MAIL FROM` / `RCPT TO` / `DATA`).
 
 ## Privacy & security notes
 
