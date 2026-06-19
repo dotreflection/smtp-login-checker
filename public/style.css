@@ -349,9 +349,10 @@ label {
   letter-spacing: 0.01em;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="password"],
+/* Style every text-like input (text, email, number, password, …) but not the
+   checkbox. Listing types individually previously missed type="email", which
+   left the recipient and From fields with the browser's default white box. */
+input:not([type="checkbox"]):not([type="radio"]),
 select {
   width: 100%;
   font: inherit;
